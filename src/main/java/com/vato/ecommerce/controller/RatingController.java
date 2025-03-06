@@ -3,10 +3,17 @@ package com.vato.ecommerce.controller;
 import com.vato.ecommerce.exceptions.ProductNotFoundException;
 import com.vato.ecommerce.exceptions.UserNotFoundException;
 import com.vato.ecommerce.model.dto.RatingRequest;
+import com.vato.ecommerce.model.dto.Response;
 import com.vato.ecommerce.model.entity.Rating;
 import com.vato.ecommerce.model.entity.User;
 import com.vato.ecommerce.service.RatingService;
 import com.vato.ecommerce.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +32,16 @@ public class RatingController {
         this.ratingService = ratingService;
     }
 
+    @Operation(summary = "Create Rating")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Rating.class)
+                    )
+            )
+    })
     @PostMapping("/create")
     public ResponseEntity<Rating> createRating(
             @RequestBody RatingRequest request,
@@ -36,6 +53,18 @@ public class RatingController {
         return new ResponseEntity<>(rating, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Get Products' Rating")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = Rating.class)
+                            )
+                    )
+            )
+    })
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<Rating>> getProductsRating(
             @PathVariable("productId") Long productId,

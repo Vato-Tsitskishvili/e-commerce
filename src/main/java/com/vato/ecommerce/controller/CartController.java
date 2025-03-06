@@ -4,11 +4,16 @@ import com.vato.ecommerce.exceptions.CartNotFoundException;
 import com.vato.ecommerce.exceptions.ProductNotFoundException;
 import com.vato.ecommerce.exceptions.UserNotFoundException;
 import com.vato.ecommerce.model.dto.AddItemRequest;
-import com.vato.ecommerce.model.dto.ApiResponse;
+import com.vato.ecommerce.model.dto.Response;
 import com.vato.ecommerce.model.entity.Cart;
 import com.vato.ecommerce.model.entity.User;
 import com.vato.ecommerce.service.CartService;
 import com.vato.ecommerce.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +29,16 @@ public class CartController {
         this.cartService = cartService;
     }
 
+    @Operation(summary = "Find User's Cart")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Cart.class)
+                    )
+            )
+    })
     @GetMapping
     public ResponseEntity<Cart> findUserCart(@RequestHeader("Authorization") String jwt) throws UserNotFoundException, CartNotFoundException {
         User user = userService.findUserProfileByJwt(jwt);
@@ -32,15 +47,25 @@ public class CartController {
         return ResponseEntity.ok(cart);
     }
 
+    @Operation(summary = "Add Item to Cart")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Response.class)
+                    )
+            )
+    })
     @PutMapping("/add")
-    public ResponseEntity<ApiResponse> addItemToCart(
+    public ResponseEntity<Response> addItemToCart(
             @RequestBody AddItemRequest request,
             @RequestHeader("Authorization") String jwt
     ) throws UserNotFoundException, ProductNotFoundException, CartNotFoundException {
         User user = userService.findUserProfileByJwt(jwt);
         String message = cartService.addCartItem(user.getId(), request);
 
-        ApiResponse response = new ApiResponse(message, true);
+        Response response = new Response(message, true);
         return ResponseEntity.ok(response);
     }
 }

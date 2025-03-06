@@ -2,11 +2,16 @@ package com.vato.ecommerce.controller;
 
 import com.vato.ecommerce.exceptions.CartItemNotFoundException;
 import com.vato.ecommerce.exceptions.UserNotFoundException;
-import com.vato.ecommerce.model.dto.ApiResponse;
+import com.vato.ecommerce.model.dto.Response;
 import com.vato.ecommerce.model.entity.CartItem;
 import com.vato.ecommerce.model.entity.User;
 import com.vato.ecommerce.service.CartItemService;
 import com.vato.ecommerce.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,18 +27,38 @@ public class CartItemController {
         this.cartItemService = cartItemService;
     }
 
+    @Operation(summary = "Delete Cart Item")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Response.class)
+                    )
+            )
+    })
     @DeleteMapping("/{cartItemId}")
-    public ResponseEntity<ApiResponse> deleteCartItem(
+    public ResponseEntity<Response> deleteCartItem(
             @PathVariable("cartItemId") Long cartItemId,
             @RequestHeader("Authorization") String jwt
     ) throws UserNotFoundException, CartItemNotFoundException {
         User user = userService.findUserProfileByJwt(jwt);
         String message = cartItemService.removeCartItem(user.getId(), cartItemId);
 
-        ApiResponse response = new ApiResponse(message, true);
+        Response response = new Response(message, true);
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Update Cart Item")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Response.class)
+                    )
+            )
+    })
     @PutMapping("/{cartItemId}")
     public ResponseEntity<CartItem> updateCartItem(
             @RequestBody CartItem cartItem,

@@ -1,6 +1,6 @@
 package com.vato.ecommerce.model.dto;
 
-public record ApiResponse(
+public record Response(
         String message,
         boolean status
 ) {
