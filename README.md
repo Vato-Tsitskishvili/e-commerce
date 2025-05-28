@@ -60,7 +60,7 @@ cd e-commerce
 ### 💻 Run the Frinend Server
 
 ```bash
-cd e-commerce-frontend
+cd e-commerce-front
 npm install
 npm start
 ```
